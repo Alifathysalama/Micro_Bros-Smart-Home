@@ -10,8 +10,7 @@
 #include "KeyPad.h" // KeyPad has only one function Get_Key() that takes no i/p and return the pressed key 
 #include "open_door.h" 
 #include "temp.h"   //temp.h has two functions ADC_init() & ADC_Read()
-void ADC_Init();
-int ADC_Read(char );
+
 
 int main(void)
 {
