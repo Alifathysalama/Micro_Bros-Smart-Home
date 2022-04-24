@@ -19,9 +19,8 @@ void opendoor ()
 	TCCR1A = (1<<WGM11)|(1<<COM1A1);
 	TCCR1B = (1<<WGM12)|(1<<WGM13)|(1<<CS10)|(1<<CS11);
 	OCR1A = 65;	/* Set servo shaft at -90° position */
-	_delay_ms(1500);
+	_delay_ms(5000);
 	OCR1A = 175;	/* Set servo shaft at 0° position */
-	_delay_ms(1500);
 }
 
 
