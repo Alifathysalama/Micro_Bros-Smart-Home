@@ -11,6 +11,7 @@
 #include "open_door.h" 
 #include "temp.h"   //temp.h has two functions ADC_init() & ADC_Read()
 #include "LCD.h"
+#include "PIR_sensor.h"
 /*
 ********************   LCD functions   ********************
  * LCD_initialize() : to  initialize the LCD
@@ -63,16 +64,10 @@ int main(void)
 	LCD_initialize();
 
 
-  	//there is no need for making fun. in this part of pir motion sensor as it will be as interrupt so i didn't do header file..
-  	DDRA= ~(1<<1); // define pin A1 as input
-  	DDRD |= (1<<6) ; // define pin D6 as led output
+  	
   	while (1)
   	{
-	  	if ( PINA &(1<<1))
-	  	PORTD |=(1<<6);
-	  	else
-	  	PORTD &=~(1<<6);
-	  	
+	  
 	  	//test LCD
 		LCD_display_text("Welcome Home , ",300);
 		_delay_ms(1000);
