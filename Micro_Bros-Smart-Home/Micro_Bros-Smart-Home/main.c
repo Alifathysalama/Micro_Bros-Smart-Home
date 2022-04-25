@@ -14,9 +14,17 @@
 
 int main(void)
 {
-    
-    while (1) 
-    {
-    }
-}
+  	//there is no need for making fun. in this part of pir motion sensor as it will be as interrupt so i didn't do header file..
+  	DDRA= ~(1<<1); // define pin A1 as input
+  	DDRD |= (1<<6) ; // define pin D6 as led output
+  	while (1)
+  	{
+	  	if ( PINA &(1<<1))
+	  	PORTD |=(1<<6);
+	  	else
+	  	PORTD &=~(1<<6);
+	  	
+	  	
+  	}
+ }
 
