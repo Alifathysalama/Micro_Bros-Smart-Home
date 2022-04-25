@@ -28,8 +28,8 @@ connection | | |	|  |  |		| | | | | | | |		| |
  ATmega16 31 30 29 16  17 21	29 28 ....... 22
 
  	 	  G	 5		P  P  P		P P ...       P		5 G
- 	 	  N	 V		A  D  D		C C ...		  C		v N
- 	 	  D			3  3  7		0 1 ...		  7		  D
+ 	 	  N	 V		A  A  D		C C ...		  C		v N
+ 	 	  D			3  4  7		0 1 ...		  7		  D
 
 * RS    : register select	 --> 1: data   , 0: command
 * RW    : read/write  		 --> 1: write  , 0: read
@@ -64,7 +64,7 @@ enum LCD_command
 void LCD_send_command( uint8_t command )
 {
 	PORTA &= ~(1<<3);	//set RS to 0 to send command
-	PORTD &= ~(1<<3); 	//set RW t0 0 to write
+	PORTA &= ~(1<<4); 	//set RW t0 0 to write
 	_delay_ms(20);
 	PORTD |= (1<<7);	//enable LCD by set E
 	_delay_ms(20);
@@ -78,8 +78,8 @@ void LCD_send_command( uint8_t command )
 void LCD_initialize()
 {
 	DDRC = 0xff; 						//make all port as output
-	DDRD |= (1<<3)|(1<<7);				//make RS,RW as output
-	DDRA |= (1<<3);						//E as output
+	DDRA |= (1<<3)|(1<<4);						//make RS,RW as output
+	DDRD |= (1<<7);						//make E as output
 	LCD_send_command(LCD_set_mode_8bit_2r);	//set the mode to 8 bit , 2 row
 	LCD_send_command(LCD_display_on_cursor_off);
 	LCD_send_command(LCD_auto_increment_cursor);
