@@ -84,25 +84,24 @@ int main(void)
 		LCD_shift_entire_display(0, 3 , 500);
 		LCD_shift_entire_display(1, 3 , 500);
 		//test KeyPad
-		data_final=KeyPad_Num();
-		if(Get_Key_pressed()==50) // same as pressing d which means enter
+		//test KeyPad
+		LCD_display_text("EnterPassword:",0);
+		for(int i =0 ; i<5;i++)
 		{
-			for(int j =0;j<4;j++)
+			ch[i]=Get_Key_pressed();
+			if(ch[i]=='D')
 			{
-				ch[j]=' ';
+				LCD_display_text("entered",0);
+				for(int i=0;i<5;i++)
+				{
+					LCD_display_char(ch[i]);
+					_delay_ms(2);
+				}
 			}
-			LCD_set_Cursor(1,5);
-			itoa(data_final,ch,10);
-			for(int j=0;j<5;j++)
-			{
-				if(ch[j]<'0' || ch[j]>'9')
-				LCD_display_char(' ');
-				else
-				LCD_display_char(ch[j]);
-			}
+			LCD_display_char(ch[i]);
+			_delay_ms(2);
 		}
 		_delay_ms(200);
-		
   	}
  }
 
