@@ -24,9 +24,9 @@ unsigned char colloc, rowloc;
 
 uint8_t Get_Key_pressed(void) // the main function to get the character pressed on the keypad.
 {
+	KEY_DDR = 0xF0;           /* set port direction as input-output */
 	while (1)
 	{
-		KEY_DDR = 0xF0;           /* set port direction as input-output */
 		KEY_PRT = 0xFF;
 
 		do

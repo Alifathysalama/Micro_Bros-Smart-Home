@@ -3,20 +3,24 @@
  *
  * Created: 4/24/2022 2:37:59 AM
  * Author : Micro_Bros
- */ 
-#define F_CPU 8000000UL
+ */
+
 #include <avr/io.h>
 #include <util/delay.h>
-#include "KeyPad.h" /*
+#include <avr/interrupt.h>
+#include "KeyPad.h"
+#include <string.h>
+/*
 ********************   KEYPAD FUNCTIONS   ********************
-keypad has two function one was not necessary but made it only to ease it on main for us which is 
-1-KeyPad_init() which is made only for initializing portb for keypad and and enable pull up resistor 
+keypad has two function one was not necessary but made it only to ease it on main for us which is
+1-KeyPad_init() which is made only for initializing portb for keypad and and enable pull up resistor
 2- char Get_Key_Pressed(void) which take no input and return the character pressed from the user and if there no character pressed from the user it will return the character N
 */
-#include "open_door.h" 
-#include "temp.h"   //temp.h has two functions ADC_init() & ADC_Read()
+
+#include "TEMP.h"   //temp.h has two functions ADC_init() & ADC_Read()
 #include "LCD.h"
-#include "PIR_sensor.h"
+#include "PIR.h"
+#include "Buzzer.h"
 /*
 ********************   LCD functions   ********************
  * LCD_initialize() : to  initialize the LCD
@@ -64,44 +68,85 @@ keypad has two function one was not necessary but made it only to ease it on mai
 						//set cursor to row 1 ,then set the position with "|"
 */
 
+static unsigned char password[4]="0000";
+static unsigned int  counter = 0;
+void Button_Led_initialize()
+{
+	DDRD |=(1<<2);
+	DDRA |= (1<<2);
+	MCUCR |= (1 << ISC01);
+	GICR |= (1 << INT0);
+}
+
 int main(void)
-{	
-	KeyPad_init();
+{
+	//KeyPad_init();
 	LCD_initialize();
-	unsigned char ch[4]={' '};
-	uint16_t data_final ; // for final display
- char pressed_key;
-  	
+	PIR_initialize();
+	Temp_initialize();
+	buzzer_initialize();
+	Button_Led_initialize();
+	sei();
+
+//	unsigned char ch[4]={' '};
+//	uint16_t data_final ; // for final display
+//	char pressed_key;
+
+	LCD_display_text("Welcome Home , ",0);
+	_delay_ms(10);
+	LCD_set_Cursor(1,0);
+	LCD_display_text("Mr. abdelrhman",0);
+	_delay_ms(100);
+
   	while (1)
   	{
-	  
-	  	//test LCD
-		LCD_display_text("Welcome Home , ",300);
-		_delay_ms(1000);
-		LCD_set_Cursor(1,0);
-		LCD_display_text("Mr. abdelrhman",300);
-		_delay_ms(1000);
-		LCD_shift_entire_display(0, 3 , 500);
-		LCD_shift_entire_display(1, 3 , 500);
-		//test KeyPad
-		//test KeyPad
-		LCD_display_text("EnterPassword:",0);
-		for(int i =0 ; i<5;i++)
-		{
-			ch[i]=Get_Key_pressed();
-			if(ch[i]=='D')
-			{
-				LCD_display_text("entered",0);
-				for(int i=0;i<5;i++)
-				{
-					LCD_display_char(ch[i]);
-					_delay_ms(2);
-				}
-			}
-			LCD_display_char(ch[i]);
-			_delay_ms(2);
-		}
-		_delay_ms(200);
+
   	}
  }
 
+ISR(INT0_vect)
+{
+	unsigned char c ;
+	_delay_ms(10);
+	unsigned char entered_password[4]={' '};
+
+	while(counter != 3)
+	{
+		LCD_clear();
+		LCD_display_text("enter:",0);
+		for(int i =0 ; i<4 ; i++)
+		{
+			entered_password[i]=Get_Key_pressed();
+			LCD_display_char(entered_password[i]); //##change it to '*'
+			_delay_ms(2);
+		}
+
+		if( strcmp(entered_password , password) != 0)
+		{
+			counter++;
+			LCD_clear();
+			LCD_display_text("Wrong password",0);
+			LCD_set_Cursor(1,0);
+			LCD_display_text("You have ",0);
+			c=3-counter+'0';
+			LCD_display_char(c);
+			LCD_display_text(" left",0);
+		}
+		else
+		{
+			counter = 3;
+			return;
+		}
+	}
+
+	if(counter==3)
+	{
+		LCD_clear();
+		LCD_set_Cursor(1,3);
+		LCD_display_text("a Thief !!",0);
+		LCD_set_Cursor(1,5);
+		LCD_display_text("go away !!",0);
+		buzzer_turn_on(1000); //time in ms
+		counter = 0;
+	}
+}
