@@ -68,7 +68,8 @@ int main(void)
 {	
 	KeyPad_init();
 	LCD_initialize();
-
+	unsigned char ch[4]={' '};
+	uint16_t data_final ; // for final display
  char pressed_key;
   	
   	while (1)
@@ -83,10 +84,24 @@ int main(void)
 		LCD_shift_entire_display(0, 3 , 500);
 		LCD_shift_entire_display(1, 3 , 500);
 		//test KeyPad
-		LCD_clear();
-		LCD_set_Cursor(0,1);
-		if(Get_Key_pressed()!='N')(LCD_display_char(Get_Key_pressed()));
-		_delay_ms(100);
+		data_final=KeyPad_Num();
+		if(Get_Key_pressed()==50) // same as pressing d which means enter
+		{
+			for(int j =0;j<4;j++)
+			{
+				ch[j]=' ';
+			}
+			LCD_set_Cursor(1,5);
+			itoa(data_final,ch,10);
+			for(int j=0;j<5;j++)
+			{
+				if(ch[j]<'0' || ch[j]>'9')
+				LCD_display_char(' ');
+				else
+				LCD_display_char(ch[j]);
+			}
+		}
+		_delay_ms(200);
 		
   	}
  }
