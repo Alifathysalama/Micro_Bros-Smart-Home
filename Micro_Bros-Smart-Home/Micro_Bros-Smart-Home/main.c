@@ -7,7 +7,12 @@
 #define F_CPU 8000000UL
 #include <avr/io.h>
 #include <util/delay.h>
-#include "KeyPad.h" // KeyPad has only one function Get_Key() that takes no i/p and return the pressed key 
+#include "KeyPad.h" /*
+********************   KEYPAD FUNCTIONS   ********************
+keypad has two function one was not necessary but made it only to ease it on main for us which is 
+1-KeyPad_init() which is made only for initializing portb for keypad and and enable pull up resistor 
+2- char Get_Key_Pressed(void) which take no input and return the character pressed from the user and if there no character pressed from the user it will return the character N
+*/
 #include "open_door.h" 
 #include "temp.h"   //temp.h has two functions ADC_init() & ADC_Read()
 #include "LCD.h"
@@ -60,10 +65,11 @@
 */
 
 int main(void)
-{
+{	
+	KeyPad_init();
 	LCD_initialize();
 
-
+ char pressed_key;
   	
   	while (1)
   	{
@@ -76,6 +82,12 @@ int main(void)
 		_delay_ms(1000);
 		LCD_shift_entire_display(0, 3 , 500);
 		LCD_shift_entire_display(1, 3 , 500);
+		//test KeyPad
+		LCD_clear();
+		LCD_set_Cursor(0,1);
+		if(Get_Key_pressed()!='N')(LCD_display_char(Get_Key_pressed()));
+		_delay_ms(100);
+		
   	}
  }
 
