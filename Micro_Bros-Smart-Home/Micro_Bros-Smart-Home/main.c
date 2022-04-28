@@ -98,6 +98,7 @@ int main(void)
 	LCD_display_text("Mr. abdelrhman",0);
 	_delay_ms(100);
 
+	enter_the_door(); //may be deleted
   	while (1)
   	{
 
@@ -110,7 +111,7 @@ ISR(INT0_vect)
 	_delay_ms(10);
 	unsigned char entered_password[4]={' '};
 
-	while(counter != 3)
+	while( 1 )
 	{
 		LCD_clear();
 		LCD_display_text("enter:",0);
@@ -121,7 +122,7 @@ ISR(INT0_vect)
 			_delay_ms(2);
 		}
 
-		if( strcmp(entered_password , password) != 0)
+		if( (memcmp(entered_password, password, sizeof(entered_password)) != 0) )
 		{
 			counter++;
 			LCD_clear();
@@ -131,22 +132,31 @@ ISR(INT0_vect)
 			c=3-counter+'0';
 			LCD_display_char(c);
 			LCD_display_text(" left",0);
+
+			if(counter == 3)
+			{
+				LCD_clear();
+				LCD_set_Cursor(1,3);
+				LCD_display_text("a Thief !!",0);
+				LCD_set_Cursor(1,5);
+				LCD_display_text("go away !!",0);
+				buzzer_turn_on(1000); //time in ms
+				counter = 0;
+				break;
+			}
 		}
+
 		else
 		{
-			counter = 3;
-			return;
+			LCD_clear();
+			counter = 0;
+			break;
 		}
 	}
+}
 
-	if(counter==3)
-	{
-		LCD_clear();
-		LCD_set_Cursor(1,3);
-		LCD_display_text("a Thief !!",0);
-		LCD_set_Cursor(1,5);
-		LCD_display_text("go away !!",0);
-		buzzer_turn_on(1000); //time in ms
-		counter = 0;
-	}
+void enter_the_door()
+{
+	PORTD |= (1<<2);
+	PORTD &= ~(1<<2);
 }
