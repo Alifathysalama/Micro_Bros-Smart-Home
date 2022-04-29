@@ -17,10 +17,11 @@ keypad has two function one was not necessary but made it only to ease it on mai
 2- char Get_Key_Pressed(void) which take no input and return the character pressed from the user and if there no character pressed from the user it will return the character N
 */
 
-#include "TEMP.h"   //temp.h has two functions ADC_init() & ADC_Read()
-#include "LCD.h"
+//#include "TEMP.h"   //temp.h has two functions ADC_init() & ADC_Read()
 #include "PIR.h"
 #include "Buzzer.h"
+#include "motor.h"
+#include "LCD.h"
 /*
 ********************   LCD functions   ********************
  * LCD_initialize() : to  initialize the LCD
@@ -71,7 +72,8 @@ keypad has two function one was not necessary but made it only to ease it on mai
 static unsigned char password[4]="0000";
 static unsigned int  counter = 0;
 void Button_Led_initialize()
-{
+{	DDRD|=(1<<0);
+	DDRD|=(1<<6);
 	DDRD |=(1<<2);
 	DDRA |= (1<<2);
 	MCUCR |= (1 << ISC01);
@@ -83,7 +85,7 @@ int main(void)
 	//KeyPad_init();
 	LCD_initialize();
 	PIR_initialize();
-	Temp_initialize();
+	//Temp_initialize();
 	buzzer_initialize();
 	Button_Led_initialize();
 	sei();
@@ -101,7 +103,7 @@ int main(void)
 	enter_the_door(); //may be deleted
   	while (1)
   	{
-
+  		PIR_DETECT_MOTION();
   	}
  }
 
@@ -125,6 +127,9 @@ ISR(INT0_vect)
 		if( (memcmp(entered_password, password, sizeof(entered_password)) != 0) )
 		{
 			counter++;
+			PORTD|=(1<<0);
+			_delay_ms(1000);
+			PORTD&=~(1<<0);
 			LCD_clear();
 			LCD_display_text("Wrong password",0);
 			LCD_set_Cursor(1,0);
@@ -137,9 +142,9 @@ ISR(INT0_vect)
 			{
 				LCD_clear();
 				LCD_set_Cursor(1,3);
-				LCD_display_text("a Thief !!",0);
-				LCD_set_Cursor(1,5);
-				LCD_display_text("go away !!",0);
+				LCD_display_text("a Thief !! ",0);
+				LCD_set_Cursor(1,3);
+				LCD_display_text("  go away !! ",0);
 				buzzer_turn_on(1000); //time in ms
 				counter = 0;
 				break;
@@ -149,14 +154,12 @@ ISR(INT0_vect)
 		else
 		{
 			LCD_clear();
+			PORTA|=(1<<2);
+			_delay_ms(1000);
+			PORTA&=~(1<<2);
+			opendoor();
 			counter = 0;
 			break;
 		}
 	}
-}
-
-void enter_the_door()
-{
-	PORTD |= (1<<2);
-	PORTD &= ~(1<<2);
 }
