@@ -21,6 +21,7 @@ keypad has two function one was not necessary but made it only to ease it on mai
 #include "PIR.h"
 #include "Buzzer.h"
 #include "motor.h"
+#include "TEMP.h"
 #include "LCD.h"
 /*
 ********************   LCD functions   ********************
@@ -69,20 +70,26 @@ keypad has two function one was not necessary but made it only to ease it on mai
 						//set cursor to row 1 ,then set the position with "|"
 */
 
+#define F_CPU 8000000UL
+
 static unsigned char password[4]="0000";
-static unsigned int  counter = 0;
 void Button_Led_initialize()
-{	DDRD|=(1<<0);
-	DDRD|=(1<<6);
-	DDRD |=(1<<2);
-	DDRA |= (1<<2);
+{	DDRD  |= (1<<0); //wrong password LED
+	DDRD  |= (1<<6); //PIR LED
+	DDRD  |= (1<<2); //KEYBAD interrupt
+	DDRA  |= (1<<2); //right password LED
 	MCUCR |= (1 << ISC01);
-	GICR |= (1 << INT0);
+	GICR  |= (1 << INT0);
+}
+
+void enter_the_door()
+{
+	PORTD |=  (1<<2);
+	PORTD &= ~(1<<2);
 }
 
 int main(void)
 {
-	//KeyPad_init();
 	LCD_initialize();
 	PIR_initialize();
 	//Temp_initialize();
@@ -104,13 +111,16 @@ int main(void)
   	while (1)
   	{
   		PIR_DETECT_MOTION();
+  		LCD_clear();
+  		LCD_set_Cursor(0,0);
+
   	}
  }
 
 ISR(INT0_vect)
 {
-	unsigned char c ;
 	_delay_ms(10);
+	unsigned int  counter = 0;
 	unsigned char entered_password[4]={' '};
 
 	while( 1 )
@@ -127,26 +137,25 @@ ISR(INT0_vect)
 		if( (memcmp(entered_password, password, sizeof(entered_password)) != 0) )
 		{
 			counter++;
-			PORTD|=(1<<0);
-			_delay_ms(1000);
-			PORTD&=~(1<<0);
+			PORTD|=(1<<0); 	//led on
 			LCD_clear();
 			LCD_display_text("Wrong password",0);
 			LCD_set_Cursor(1,0);
 			LCD_display_text("You have ",0);
-			c=3-counter+'0';
-			LCD_display_char(c);
+			LCD_display_char( 3-counter+'0' );
 			LCD_display_text(" left",0);
+			_delay_ms(500);
+			PORTD&=~(1<<0); //led off
 
 			if(counter == 3)
 			{
 				LCD_clear();
 				LCD_set_Cursor(1,3);
 				LCD_display_text("a Thief !! ",0);
-				LCD_set_Cursor(1,3);
+				LCD_set_Cursor(1,2);
 				LCD_display_text("  go away !! ",0);
 				buzzer_turn_on(1000); //time in ms
-				counter = 0;
+				counter = 0; //reset counter
 				break;
 			}
 		}
@@ -154,11 +163,11 @@ ISR(INT0_vect)
 		else
 		{
 			LCD_clear();
-			PORTA|=(1<<2);
-			_delay_ms(1000);
-			PORTA&=~(1<<2);
+			PORTA  |=  (1<<2);	//led on
 			opendoor();
-			counter = 0;
+			_delay_ms(500);
+			PORTA  &= ~(1<<2);  //led off
+			counter = 0;		//reset counter
 			break;
 		}
 	}

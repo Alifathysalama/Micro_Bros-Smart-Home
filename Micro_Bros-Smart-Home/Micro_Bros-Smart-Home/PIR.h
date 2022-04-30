@@ -16,10 +16,10 @@ void PIR_initialize()
 
 void PIR_DETECT_MOTION ()
 {
-	if ( PINA &(1<<1))
-	PORTD |=(1<<6);
+	if ( PINA & (1<<1) )
+	PORTD |= (1<<6); //PIR led on
 	else
-	PORTD &=~(1<<6);
+	PORTD &=~ (1<<6); //PIR led off
 
 }
 
