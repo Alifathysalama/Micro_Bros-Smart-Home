@@ -14,13 +14,12 @@ void PIR_initialize()
 	DDRD |= (1<<6) ; // define pin D6 as led output
 }
 
-void PIR_DETECT_MOTION ()
+void PIR_DETECT_MOTION()
 {
 	if ( PINA & (1<<1) )
 	PORTD |= (1<<6); //PIR led on
 	else
 	PORTD &=~ (1<<6); //PIR led off
-
 }
 
 

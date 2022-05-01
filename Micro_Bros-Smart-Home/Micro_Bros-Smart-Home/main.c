@@ -17,7 +17,7 @@ keypad has two function one was not necessary but made it only to ease it on mai
 2- char Get_Key_Pressed(void) which take no input and return the character pressed from the user and if there no character pressed from the user it will return the character N
 */
 
-//#include "TEMP.h"   //temp.h has two functions ADC_init() & ADC_Read()
+#include "TEMP.h"   //temp.h has two functions ADC_init() & ADC_Read()
 #include "PIR.h"
 #include "Buzzer.h"
 #include "motor.h"
@@ -73,6 +73,7 @@ keypad has two function one was not necessary but made it only to ease it on mai
 #define F_CPU 8000000UL
 
 static unsigned char password[4]="0000";
+
 void Button_Led_initialize()
 {	DDRD  |= (1<<0); //wrong password LED
 	DDRD  |= (1<<6); //PIR LED
@@ -90,31 +91,35 @@ void enter_the_door()
 
 int main(void)
 {
+	//KeyPad_init();
 	LCD_initialize();
 	PIR_initialize();
-	//Temp_initialize();
+	Temp_initialize();
 	buzzer_initialize();
 	Button_Led_initialize();
 	sei();
-
-//	unsigned char ch[4]={' '};
-//	uint16_t data_final ; // for final display
-//	char pressed_key;
 
 	LCD_display_text("Welcome Home , ",0);
 	_delay_ms(10);
 	LCD_set_Cursor(1,0);
 	LCD_display_text("Mr. abdelrhman",0);
-	_delay_ms(100);
 
-	enter_the_door(); //may be deleted
-  	while (1)
-  	{
-  		PIR_DETECT_MOTION();
-  		LCD_clear();
-  		LCD_set_Cursor(0,0);
+	enter_the_door();
+	_delay_ms(50);
 
-  	}
+	int curr_temp = 255; //just for help
+	int last_temp;		//just for help
+	while (1)
+	  	{
+			PIR_DETECT_MOTION(); //led on if detect motion
+			last_temp = curr_temp;
+			curr_temp = Temp_GetInput();
+			Temp_warning(curr_temp ,30);//led on if the curr_temp lager than 30
+			if(curr_temp == 255 || (curr_temp-last_temp) )
+			{ //if it is first time to print or if the temp changes
+				Temp_display(curr_temp);
+			}
+	  	}
  }
 
 ISR(INT0_vect)

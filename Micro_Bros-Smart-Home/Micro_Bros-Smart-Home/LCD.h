@@ -60,7 +60,6 @@ enum LCD_command
 						//set cursor to row 1 ,then set the position with "|"
 };
 
-
 void LCD_send_command( uint8_t command )
 {
 	PORTA &= ~(1<<3);	//set RS to 0 to send command
@@ -78,7 +77,7 @@ void LCD_send_command( uint8_t command )
 void LCD_initialize()
 {
 	DDRC = 0xff; 						//make all port as output
-	DDRA |= (1<<3)|(1<<4);						//make RS,RW as output
+	DDRA |= (1<<3)|(1<<4);				//make RS,RW as output
 	DDRD |= (1<<7);						//make E as output
 	LCD_send_command(LCD_set_mode_8bit_2r);	//set the mode to 8 bit , 2 row
 	LCD_send_command(LCD_display_on_cursor_off);
