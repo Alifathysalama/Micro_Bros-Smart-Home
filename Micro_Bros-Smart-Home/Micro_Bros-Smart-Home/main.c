@@ -73,6 +73,8 @@ keypad has two function one was not necessary but made it only to ease it on mai
 #define F_CPU 8000000UL
 
 static unsigned char password[4]="0000";
+static int curr_temp = 255; //just for help , 255 is init value
+static int last_temp = 255; //just for help , 255 is init value
 
 void Button_Led_initialize()
 {	DDRD  |= (1<<0); //wrong password LED
@@ -107,15 +109,14 @@ int main(void)
 	enter_the_door();
 	_delay_ms(50);
 
-	int curr_temp = 255; //just for help
-	int last_temp;		//just for help
+
 	while (1)
 	  	{
 			PIR_DETECT_MOTION(); //led on if detect motion
 			last_temp = curr_temp;
 			curr_temp = Temp_GetInput();
 			Temp_warning(curr_temp ,30);//led on if the curr_temp lager than 30
-			if(curr_temp == 255 || (curr_temp-last_temp) )
+			if(last_temp == 255 || (curr_temp-last_temp) )
 			{ //if it is first time to print or if the temp changes
 				Temp_display(curr_temp);
 			}
@@ -173,6 +174,7 @@ ISR(INT0_vect)
 			_delay_ms(500);
 			PORTA  &= ~(1<<2);  //led off
 			counter = 0;		//reset counter
+			last_temp = 255;	//to print temp when return to main
 			break;
 		}
 	}
