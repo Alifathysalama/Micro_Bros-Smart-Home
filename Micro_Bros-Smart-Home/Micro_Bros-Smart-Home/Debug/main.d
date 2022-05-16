@@ -1,14 +1,14 @@
-main.o main.o: ../main.c ../KeyPad.h ../PIR.h ../Buzzer.h ../motor.h \
-  ../TEMP.h ../LCD.h
+main.o main.o: ../main.c ../main.h ../TEMP.h ../LCD.h ../PIR.h \
+  ../Buzzer.h ../motor.h
 
-../KeyPad.h:
+../main.h:
+
+../TEMP.h:
+
+../LCD.h:
 
 ../PIR.h:
 
 ../Buzzer.h:
 
 ../motor.h:
-
-../TEMP.h:
-
-../LCD.h:

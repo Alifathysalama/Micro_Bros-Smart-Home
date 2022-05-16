@@ -8,19 +8,14 @@
 #ifndef BUZZER_H_
 #define BUZZER_H_
 
-void buzzer_initialize()
-{
-	DDRD |= (1<<4);
-	PORTD &= ~(1<<4);
-}
+#include <stdint.h>
+#include <avr/io.h>
+#include <util/delay.h>
+
+void buzzer_initialize();
 
 //function to turn on buzzer for a certain time
 //time in ms
-void buzzer_turn_on(double time)
-{
-	PORTD |= (1<<4);
-	_delay_ms(time);
-	PORTD &= ~(1<<4);
-}
+void buzzer_turn_on(double time);
 
 #endif /* BUZZER_H_ */
